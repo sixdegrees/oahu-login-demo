@@ -1,0 +1,62 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "4df5c4c2814c3d2146eed6e37f4b53be",
+    "packages": [
+        {
+            "name": "oahu/oahu",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sixdegrees/oahu-php-client.git",
+                "reference": "9d74aa3bff5edb9003e52afbdeb73fb19b4ff8a9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sixdegrees/oahu-php-client/zipball/9d74aa3bff5edb9003e52afbdeb73fb19b4ff8a9",
+                "reference": "9d74aa3bff5edb9003e52afbdeb73fb19b4ff8a9",
+                "shasum": ""
+            },
+            "suggest": {
+                "facebook/php-sdk": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Oahu": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oahu Dev Team",
+                    "email": "dev@oahu.fr"
+                }
+            ],
+            "description": "Oahu PHP Client",
+            "homepage": "http://github.com/sixdegrees/oahu-php-client",
+            "time": "2014-03-14 10:28:55"
+        }
+    ],
+    "packages-dev": [
+
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "oahu/oahu": 20
+    },
+    "platform": [
+
+    ],
+    "platform-dev": [
+
+    ]
+}

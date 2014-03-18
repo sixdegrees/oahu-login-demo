@@ -1,0 +1,7 @@
+{
+  "name" : "oahu/universal-video-actu",
+  "version" : "0.1.0",
+  "require" : {
+    "oahu/oahu": "dev-master"
+  }
+}
