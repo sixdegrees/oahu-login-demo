@@ -21,39 +21,91 @@
       });
 
       Oahu.init({ appId: "<?php echo $config['oahu']['appId'] ?>" });
+
+      Oahu.Apps.register('badge', {
+        templates: ['badge'],
+        namespace: 'badge',
+        refresh_events : ['oahu:account:success'],
+        attrs: ['achievementId'],
+        initialize: function() {
+          if (Oahu.account) {
+            this.badge = Oahu.account.player.badges[this.achievementId];
+          }
+        },
+        achieve: function($el) {
+          var self = this;
+          $el.attr('disabled', true);
+          var score = $('input[name="score"]').val() || 0;
+          $.post('./achieve.php', { score: score }).then(function(badge) {
+            if (badge) {
+              self.badge = badge;
+              self.render();
+            } else {
+              $el.attr('disabled', false);
+            }
+          }, function() { $el.attr('disabled', false); });
+        },
+        debugResetPlayer: function() {
+          var self = this;
+          $.ajax({ 
+            url: './achieve.php', 
+            type: 'delete', 
+            success: function(reset) {
+              document.location.reload();  
+            }
+          });
+        }
+      });
     });
     </script>
   </head>
   <body class="container">
+    <!-- Badge template -->
+    <script type="text/template" data-oahu-template="badge">
+    {{#if account}}
+      {{#if badge}}
+        <h3>Score: {{badge.data.score}}</h3>
+        <pre>{{json badge}}</pre>
+        <a class="btn btn-danger" data-oahu-action="badge.debugResetPlayer">Reset !</a>
+      {{else}}
+        <input type="number" name="score" value="" placeholder="Score"  class="form-control" />
+        <button class="btn btn-primary" data-oahu-action="badge.achieve">Unlock !</button>
+      {{/if}}
+    {{else}}
+    You must login first
+    {{/if}}
+    </script>
+
+    <!-- optional identity widget template override -->
+    <script type="text/template" data-oahu-template="identity">
+    {{#account}}
+      <div class='account'>
+        <img class='avatar' src="{{picture}}">
+        <span class="name">{{name}}</span>
+        <a class="btn" data-oahu-action="disconnect">Logout</a>
+      </div>
+    {{/account}}
+    {{^account}}
+      <div class='connect'>
+        <a href="#" data-oahu-action="connect" data-oahu-provider="facebook">Login with Facebook</a>
+      </div>
+    {{/account}}
+    </script>
+
+
     <div class="row">
 
       <!-- With a simple identity widget -->
 
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <h3>With a simple identity widget</h3>
         <div class="well" data-oahu-widget="identity"></div>
-
-        <!-- optional identity widget template override -->
-        <script type="text/template" data-oahu-template="identity">
-        {{#account}}
-          <div class='account'>
-            <img class='avatar' src="{{picture}}">
-            <span class="name">{{name}}</span>
-            <a class="btn" data-oahu-action="disconnect">Logout</a>
-          </div>
-        {{/account}}
-        {{^account}}
-          <div class='connect'>
-            <a href="#" data-oahu-action="connect" data-oahu-provider="facebook">Login with Facebook</a>
-          </div>
-        {{/account}}
-        </script>
       </div>
 
       <!-- with jquery only -->
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <h3>with jquery only</h3>
         <div class="well">
           <span class="user-name"></span>
@@ -78,6 +130,12 @@
         });
         </script>
       </div>
+      <div class="col-md-4">
+        <h3>Achieve & Badge</h3>
+        <div class="well" data-oahu-widget="badge" data-oahu-achievement-id="<?php echo getenv('OAHU_ACHIEVEMENT_ID') ?>"></div>
+      </div>
+
+
     </div>
     <div class="jumbotron">
       <h3>Current Account (server side)</h3>
