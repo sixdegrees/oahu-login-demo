@@ -20,7 +20,7 @@
         });
       });
 
-      Oahu.init({ appId: "<?php echo $config['oahu']['appId'] ?>" });
+      Oahu.init({ appId: "<?php echo $config['oahu']['appId'] ?>", debug: true, verbose: true });
 
       Oahu.Apps.register('badge', {
         templates: ['badge'],
@@ -43,6 +43,9 @@
             } else {
               $el.attr('disabled', false);
             }
+
+            // Emit an event for the leaderboard to refresh...
+            Oahu.trigger('game:achieved');
           }, function() { $el.attr('disabled', false); });
         },
         debugResetPlayer: function() {
@@ -54,6 +57,17 @@
               document.location.reload();  
             }
           });
+        }
+      });
+      Oahu.Apps.register('leaderboard', {
+        templates: ['leaders'],
+        namespace: 'leaders',
+        refresh_events: ['oahu:account:success', 'game:achieved'],
+        attrs: ['achievementId'],
+        initialize: function() {
+        },
+        getData: function(render) {
+          Oahu.app.getLeaderboard({ id: this.achievementId }, render);
         }
       });
     });
@@ -69,11 +83,28 @@
         <a class="btn btn-danger" data-oahu-action="badge.debugResetPlayer">Reset !</a>
       {{else}}
         <input type="number" name="score" value="" placeholder="Score"  class="form-control" />
-        <button class="btn btn-primary" data-oahu-action="badge.achieve">Unlock !</button>
+        <button class="btn btn-primary" data-oahu-action="badge.achieve">Unlock <? echo getenv('OAHU_ACHIEVEMENT_ID'); ?>!</button>
       {{/if}}
     {{else}}
     You must login first
     {{/if}}
+    </script>
+
+    <script type="text/template" data-oahu-template="leaders">
+    <h3>Leaderboard on {{total_members}}</h3>
+    {{#if current_player_rank}}
+    <h5>You current rank is {{current_player_rank}}</h5>
+    {{else}}
+    <h5>Play to get a rank !</h5>
+    {{/if}}
+    <ul>
+      {{#players}}
+      <li>
+        <h5>Rank: {{rank}} - Score: {{score}}</h5>
+        <img src="{{picture}}" />{{name}}
+      </li>
+      {{/players}}
+    </ul>
     </script>
 
     <!-- optional identity widget template override -->
@@ -137,9 +168,13 @@
 
 
     </div>
-    <div class="jumbotron">
-      <h3>Current Account (server side)</h3>
-      <pre class="current-user"><?php print_r(json_encode($current_account, JSON_PRETTY_PRINT)); ?></pre>
+    <div class="row">
+      <div class="well col-md-6">
+        <h3>Current Account (server side)</h3>
+        <pre class="current-user"><?php print_r(json_encode($current_account, JSON_PRETTY_PRINT)); ?></pre>
+      </div>
+      <div class="well col-md-6" data-oahu-widget="leaderboard" data-oahu-achievement-id="<?php echo getenv('OAHU_ACHIEVEMENT_ID');?>">
+      </div>
     </div>
 
   </body>
