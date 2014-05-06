@@ -67,9 +67,39 @@
         initialize: function() {
         },
         getData: function(render) {
-          Oahu.app.getLeaderboard({ id: this.achievementId }, render);
+          var self = this;
+          Oahu.app.getLeaderboard({ id: this.achievementId }, function(leaderboard) {
+            self.leaderboard = leaderboard;
+            render();
+          });
         }
       });
+
+      Oahu.Apps.register('friends_list', {
+        templates: ['friends_list'],
+        namespace: 'friends_list',
+        refresh_events: ['oahu:account:success'],
+        attrs: ['achievementId'],
+        initialize: function() {
+        },
+        getData: function(render) {
+          var self = this;
+          Oahu.app.getFriends({}, function(friends) {
+            var friendsList = _.compact(_.map(friends, function(friend) {
+              var score, badge = friend.badges[self.achievementId];
+              if (badge && badge.data) {
+                score = parseInt((badge.data.score || 0), 10);
+                return { name: friend.name, picture: friend.picture, score: score };
+              }
+            }));
+            self.friends = _.sortBy(friendsList, function(friend) {
+              return -1 * friend.score;
+            });
+            render();
+          });
+        }
+      });
+
     });
     </script>
   </head>
@@ -91,7 +121,8 @@
     </script>
 
     <script type="text/template" data-oahu-template="leaders">
-    <h3>Leaderboard on {{total_members}}</h3>
+    {{#leaderboard}}
+    <h3>Leaderboard {{name}} on {{total_members}}</h3>
     {{#if current_player_rank}}
     <h5>You current rank is {{current_player_rank}}</h5>
     {{else}}
@@ -104,6 +135,18 @@
         <img src="{{picture}}" />{{name}}
       </li>
       {{/players}}
+    </ul>
+    {{/leaderboard}}
+    </script>
+
+    <script type="text/template" data-oahu-template="friends_list">
+    <h4>You Facebook friends who participated</h4>
+    <ul>
+    {{#friends}}
+      <li>
+        <img src="{{picture}}" /> - {{name}} - Score: {{score}}
+      </li>
+    {{/friends}}
     </ul>
     </script>
 
@@ -169,11 +212,13 @@
 
     </div>
     <div class="row">
-      <div class="well col-md-6">
+      <div class="well col-md-4">
         <h3>Current Account (server side)</h3>
         <pre class="current-user"><?php print_r(json_encode($current_account, JSON_PRETTY_PRINT)); ?></pre>
       </div>
-      <div class="well col-md-6" data-oahu-widget="leaderboard" data-oahu-achievement-id="<?php echo getenv('OAHU_ACHIEVEMENT_ID');?>">
+      <div class="well col-md-4" data-oahu-widget="leaderboard" data-oahu-achievement-id="<?php echo getenv('OAHU_ACHIEVEMENT_ID');?>">
+      </div>
+      <div class="well col-md-4" data-oahu-widget="friends_list" data-oahu-achievement-id="<?php echo getenv('OAHU_ACHIEVEMENT_ID');?>">
       </div>
     </div>
 
