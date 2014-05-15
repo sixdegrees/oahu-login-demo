@@ -1,10 +1,11 @@
 <?php
+header('p3p: CP="NOI ADM DEV PSAi COM NAV OUR OTR STP IND DEM"');
 set_include_path(dirname(__FILE__) . ":");
 require('vendor/autoload.php');
 
 $config = array(
   "oahu" => array(
-    "host"      => "app-staging.oahu.fr",
+    "host"      => getenv('OAHU_HOST'),
     "clientId"  => getenv('OAHU_CLIENT_ID'),
     "appId"     => getenv('OAHU_APP_ID'),
     "appSecret" => getenv('OAHU_APP_SECRET'),

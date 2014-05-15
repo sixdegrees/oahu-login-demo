@@ -1,8 +1,9 @@
 <?php require_once('config.php') ?>
+<!doctype html>
 <html>
   <head>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="//<?php echo $config['oahu']['host'] ?>/assets/oahu.js"></script>
     <script src="//<?php echo $config['oahu']['host'] ?>/assets/oahu-apps.js"></script>
     <script>
@@ -20,7 +21,19 @@
         });
       });
 
-      Oahu.init({ appId: "<?php echo $config['oahu']['appId'] ?>", debug: true, verbose: true });
+      Oahu.bind('oahu:account:.*', function() {
+        var args = [].slice.call(arguments);
+        console.log('------------------------');
+        console.log("[CLIENT]", args[0])
+        console.log(JSON.stringify(args[1]));
+      });
+
+      Oahu.init({ 
+        callback_url: 'http://google.com',
+        appId: "<?php echo $config['oahu']['appId'] ?>", 
+        debug: true, 
+        // verbose: true 
+      });
 
       Oahu.Apps.register('badge', {
         templates: ['badge'],
@@ -121,6 +134,7 @@
     </script>
 
     <script type="text/template" data-oahu-template="leaders">
+    <h1>Hey {{account.id}}</h1>
     {{#leaderboard}}
     <h3>Leaderboard {{name}} on {{total_members}}</h3>
     {{#if current_player_rank}}
@@ -214,7 +228,7 @@
     <div class="row">
       <div class="well col-md-4">
         <h3>Current Account (server side)</h3>
-        <pre class="current-user"><?php print_r(json_encode($current_account, JSON_PRETTY_PRINT)); ?></pre>
+        <pre class="current-user"><?php print_r(json_encode($current_account)); ?></pre>
       </div>
       <div class="well col-md-4" data-oahu-widget="leaderboard" data-oahu-achievement-id="<?php echo getenv('OAHU_ACHIEVEMENT_ID');?>">
       </div>
