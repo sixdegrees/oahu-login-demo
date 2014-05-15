@@ -29,10 +29,8 @@
       });
 
       Oahu.init({ 
-        callback_url: 'http://google.com',
         appId: "<?php echo $config['oahu']['appId'] ?>", 
-        debug: true, 
-        // verbose: true 
+        debug: true
       });
 
       Oahu.Apps.register('badge', {
